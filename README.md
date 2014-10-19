@@ -1,6 +1,6 @@
-TF2 Throwable Sapper
+[SM] Capitalized First Word
 ===============
 
-This plugin allows you to throw your sapper and sap buildings in a radius around the thrown sapper.
+This plugin capitalizes the first word of any sentence.
 
-Similar to "Meet the Spy".
+Based of off/inspired by Runescape's chat.
