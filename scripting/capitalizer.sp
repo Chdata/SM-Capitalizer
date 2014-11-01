@@ -21,8 +21,8 @@ public Plugin:myinfo = {
 public OnPluginStart()
 {
     CreateConVar(
-        "sm_cwf_version", PLUGIN_VERSION,
-        "CWF Version",
+        "cv_capitalizer_version", PLUGIN_VERSION,
+        "Capitalizer Version",
         FCVAR_REPLICATED|FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_DONTRECORD|FCVAR_NOTIFY
     );
 }
