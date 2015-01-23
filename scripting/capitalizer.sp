@@ -7,34 +7,46 @@
 #include <sourcemod>
 #include <scp>
 
-#define PLUGIN_VERSION "0x04"
+#define PLUGIN_VERSION "0x05"
 
 public Plugin:myinfo = {
-    name = "Capitalized First Word",
+    name = "Capitalizer",
     author = "Chdata",
     description = "Capitalizes the first word of any sentence.",
     version = PLUGIN_VERSION,
     url = "http://steamcommunity.com/groups/tf2data"
 };
 
+static Handle:g_cvLowerCaseOther;
+static bool:cv_bLowerCaseOther;
+
 public OnPluginStart()
 {
     CreateConVar("cv_capitalizer_version", PLUGIN_VERSION, "Capitalizer Version", FCVAR_NOTIFY|FCVAR_DONTRECORD|FCVAR_CHEAT);
+    g_cvLowerCaseOther = CreateConVar(
+        "cv_capitalizer_lower", "0",
+        "0 = PEOPLE CAN TYPE IN FULL CAPS | 1 = Automagically lowercase other letters",
+        FCVAR_NOTIFY,
+        true, 0.0, true, 1.0
+    );
+    HookConVarChange(g_cvLowerCaseOther, ConvarChange);
+    AutoExecConfig(true, "ch.capitalizer");
+}
+
+public OnConfigsExecuted()
+{
+    cv_bLowerCaseOther = GetConVarBool(g_cvLowerCaseOther);
+}
+
+public ConvarChange(Handle:cvConvar, const String:szOldVal[], const String:szNewVal[])
+{
+    cv_bLowerCaseOther = GetConVarBool(g_cvLowerCaseOther);
 }
 
 public Action:OnChatMessage(&iAuthor, Handle:hRecipients, String:szName[], String:szMessage[])
 {
-    CapitalizeAll(szMessage);
+    CapitalizeAll(szMessage, _, cv_bLowerCaseOther);
     return Plugin_Changed;
-}
-
-/*
-    Capitalizes the first word in a string
-*/
-stock Capitalize(String:szText[])
-{
-    new i = 0; while(IsCharSpace(szText[i])){i++;}
-    szText[i] = CharToUpper(szText[i]);
 }
 
 /*
@@ -46,21 +58,24 @@ stock CapitalizeAll(String:szText[], bool:bCapitalIs = true, bool:bLowerCaseOthe
     new iLen = strlen(szText);
     new i = 0; while(IsCharSpace(szText[i])){i++;}
     szText[i] = CharToUpper(szText[i]);
-    for (++i; i < iLen && szText[i] != '\0'; i++)
+    for (++i; i < iLen; i++) //  && szText[i] != '\0'
     {
         if (IsCharPunc(szText[i]))
         {
             i++; while(IsCharSpace(szText[i])){i++;}
             szText[i] = CharToUpper(szText[i]);
+            continue;
         }
-        else if (bCapitalIs && szText[i] == 'i')
+        else if (bCapitalIs && (szText[i] == 'i' || szText[i] == 'I')) // (i-1 == -1 || i+1 == iLen) || 
         {
-            if ((i-1 == -1 || i+1 == iLen) || (IsCharSpace(szText[i-1]) && (IsCharByI(szText[i+1]) || (i+2 < iLen && szText[i+1] == ''' && IsCharAlpha(szText[i+2])))))
+            if ((IsCharSpace(szText[i-1]) && (i+1 == iLen || IsCharByI(szText[i+1]) || (i+2 < iLen && szText[i+1] == ''' && IsCharAlpha(szText[i+2])))))
             {
                 szText[i] = CharToUpper(szText[i]);
+                continue;
             }
         }
-        else if (bLowerCaseOther)
+
+        if (bLowerCaseOther)
         {
             szText[i] = CharToLower(szText[i]);
         }
@@ -82,4 +97,13 @@ stock bool:IsCharPunc(chr)
 stock bool:IsCharByI(chr)
 {
     return IsCharPunc(chr) || IsCharSpace(chr);
+}
+
+/*
+    Capitalizes the first word in a string
+*/
+stock Capitalize(String:szText[])
+{
+    new i = 0; while(IsCharSpace(szText[i])){i++;}
+    szText[i] = CharToUpper(szText[i]);
 }
