@@ -18,7 +18,6 @@ public Plugin:myinfo = {
 };
 
 static Handle:g_cvLowerCaseOther;
-static bool:cv_bLowerCaseOther;
 
 public OnPluginStart()
 {
@@ -29,23 +28,12 @@ public OnPluginStart()
         FCVAR_NOTIFY,
         true, 0.0, true, 1.0
     );
-    HookConVarChange(g_cvLowerCaseOther, ConvarChange);
     AutoExecConfig(true, "ch.capitalizer");
-}
-
-public OnConfigsExecuted()
-{
-    cv_bLowerCaseOther = GetConVarBool(g_cvLowerCaseOther);
-}
-
-public ConvarChange(Handle:cvConvar, const String:szOldVal[], const String:szNewVal[])
-{
-    cv_bLowerCaseOther = GetConVarBool(g_cvLowerCaseOther);
 }
 
 public Action:OnChatMessage(&iAuthor, Handle:hRecipients, String:szName[], String:szMessage[])
 {
-    CapitalizeAll(szMessage, _, cv_bLowerCaseOther);
+    CapitalizeAll(szMessage, _, GetConVarBool(g_cvLowerCaseOther));
     return Plugin_Changed;
 }
 
