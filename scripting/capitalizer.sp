@@ -1,17 +1,16 @@
 /*
-Automagically formats the first word of a player's message to be capitalized.
-By: Chdata
-
+    Automagically capitalizes the first word of players' messages.
+    By: Chdata
 */
 
 #pragma semicolon 1
 #include <sourcemod>
 #include <scp>
 
-#define PLUGIN_VERSION                  "0x02"
+#define PLUGIN_VERSION "0x03"
 
 public Plugin:myinfo = {
-    name = "[CFW] Capitalized First Word",
+    name = "Capitalized First Word",
     author = "Chdata",
     description = "Capitalizes the first word of any sentence.",
     version = PLUGIN_VERSION,
@@ -20,24 +19,17 @@ public Plugin:myinfo = {
 
 public OnPluginStart()
 {
-    CreateConVar(
-        "cv_capitalizer_version", PLUGIN_VERSION,
-        "Capitalizer Version",
-        FCVAR_REPLICATED|FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_DONTRECORD|FCVAR_NOTIFY
-    );
+    CreateConVar("cv_capitalizer_version", PLUGIN_VERSION, "Capitalizer Version", FCVAR_NOTIFY|FCVAR_DONTRECORD|FCVAR_CHEAT);
 }
 
-public Action:OnChatMessage(&iAuthor, Handle:recipients, String:name[], String:szMessage[])
+public Action:OnChatMessage(&iAuthor, Handle:hRecipients, String:szName[], String:szMessage[])
 {
-    new i = 0; while(IsCharSpace(szMessage[i++])){}
-
-    decl String:szWhitespace[MAXLENGTH_MESSAGE];
-
-    strcopy(szWhitespace, i, szMessage); // Keep our whitespace c:
-
-    new MaxMessageLength = MAXLENGTH_MESSAGE - strlen(name) - 5;
-
-    Format(szMessage, MaxMessageLength, "%s%c%s", szWhitespace, CharToUpper(szMessage[i-1]), szMessage[i]);
-
+    Capitalize(szMessage);
     return Plugin_Changed;
+}
+
+stock Capitalize(String:szText[])
+{
+    new i = 0; while(IsCharSpace(szText[i])){i++;}
+    szText[i] = CharToUpper(szText[i]);
 }
