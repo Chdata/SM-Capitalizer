@@ -7,7 +7,7 @@
 #include <sourcemod>
 #include <scp>
 
-#define PLUGIN_VERSION "0x05"
+#define PLUGIN_VERSION "0x06"
 
 public Plugin:myinfo = {
     name = "Capitalizer",
@@ -48,7 +48,7 @@ stock CapitalizeAll(String:szText[], bool:bCapitalIs = true, bool:bLowerCaseOthe
     szText[i] = CharToUpper(szText[i]);
     for (++i; i < iLen; i++) //  && szText[i] != '\0'
     {
-        if (IsCharPunc(szText[i]))
+        if (IsCharPunc(szText[i]) && i+1 < iLen && IsCharSpace(szText[i+1]))
         {
             i++; while(IsCharSpace(szText[i])){i++;}
             szText[i] = CharToUpper(szText[i]);
